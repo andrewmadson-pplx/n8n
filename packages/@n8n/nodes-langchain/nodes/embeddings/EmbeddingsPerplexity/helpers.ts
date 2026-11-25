@@ -19,19 +19,19 @@ export function decodeBase64Int8(encoded: string): number[] {
  * Perplexity's /v1/embeddings returns base64-encoded int8 vectors and rejects
  * `encoding_format: "float"`. The OpenAI client decodes `base64` as float32, so this class
  * requests `base64_int8` explicitly (the client then returns the raw strings) and decodes
- * each embedding itself.
+ * each embedding itself. It also sends `input_type`, which the v2 models require.
  */
 export class PerplexityEmbeddings extends OpenAIEmbeddings {
 	override async embedDocuments(texts: string[]): Promise<number[][]> {
-		return await this.embed(texts);
+		return await this.embed(texts, 'document');
 	}
 
 	override async embedQuery(text: string): Promise<number[]> {
-		const [embedding] = await this.embed([text]);
+		const [embedding] = await this.embed([text], 'query');
 		return embedding;
 	}
 
-	private async embed(texts: string[]): Promise<number[][]> {
+	private async embed(texts: string[], inputType: 'query' | 'document'): Promise<number[][]> {
 		const input = this.stripNewLines ? texts.map((text) => text.replace(/\n/g, ' ')) : texts;
 		const batches = chunkArray(input, this.batchSize);
 
@@ -41,6 +41,7 @@ export class PerplexityEmbeddings extends OpenAIEmbeddings {
 					model: this.model,
 					input: batch,
 					encoding_format: 'base64_int8',
+					input_type: inputType,
 					...(this.dimensions ? { dimensions: this.dimensions } : {}),
 				} as unknown as OpenAI.EmbeddingCreateParams;
 				const { data } = await this.embeddingWithRetry(params);

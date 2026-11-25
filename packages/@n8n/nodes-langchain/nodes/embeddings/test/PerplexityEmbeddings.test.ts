@@ -43,6 +43,7 @@ describe('PerplexityEmbeddings', () => {
 			model: 'pplx-embed-v1-0.6b',
 			input: ['a', 'b'],
 			encoding_format: 'base64_int8',
+			input_type: 'document',
 			dimensions: 256,
 		});
 		expect(result).toEqual([
@@ -52,9 +53,10 @@ describe('PerplexityEmbeddings', () => {
 	});
 
 	it('should return a single vector for a query', async () => {
-		const { embeddings } = buildEmbeddings();
+		const { embeddings, create } = buildEmbeddings();
 
 		expect(await embeddings.embedQuery('what is n8n?')).toEqual([1, 0]);
+		expect(create.mock.calls[0][0]).toMatchObject({ input_type: 'query' });
 	});
 
 	it('should order embeddings by index within a batch', async () => {

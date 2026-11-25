@@ -69,6 +69,16 @@ export class EmbeddingsPerplexity implements INodeType {
 						value: 'pplx-embed-v1-4b',
 						description: '2560 dimensions',
 					},
+					{
+						name: 'pplx-embed-v2-context-0.6b',
+						value: 'pplx-embed-v2-context-0.6b',
+						description: '1024 dimensions',
+					},
+					{
+						name: 'pplx-embed-v2-context-9b',
+						value: 'pplx-embed-v2-context-9b',
+						description: '2048 dimensions',
+					},
 				],
 				description:
 					'The model which will generate the embeddings. <a href="https://docs.perplexity.ai/docs/embeddings/quickstart">Learn more</a>.',
